@@ -4,3 +4,4 @@ nohup.out
 jg.py
 myspace_dev.sql
 gunicorn.log
+app.pid
