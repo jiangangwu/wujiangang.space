@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}{% if english=="yes" %}Search results{% else %}搜索结果{% endif %}{% endblock %}
+
+{% block page_content %}
+
+{{ wtf.quick_form(form) }}
+
+<div class="post-tabs">
+{% include 'oldblogs.html' %}
+</div>
+
+
+{% if pagination %}
+<div class="pagination">
+  {{ macros.pagination_widget(pagination, '.found',keyword=keyword) }}
+</div>
+{% endif %}
+
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{{ pagedown.include_pagedown() }}
+{% endblock %}

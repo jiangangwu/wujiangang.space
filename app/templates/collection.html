@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
+
+{% block title %}{% if english == "yes" %}Collections{% else %}收藏{% endif %}{% endblock title %}
+
+{% block page_content %}
+
+<div class="post-tabs">
+  <ul class="nav nav-tabs">
+    <li {% if resp=="news" %} class="active" {% endif %}><a href="{{ url_for('.show_news',user_id=user_id) }}">{% if english == "yes" %}News{% else %}新闻{% endif %}</a></li>
+    <li {% if resp=="blog" %} class="active" {% endif %}><a href="{{ url_for('.show_blog',user_id=user_id) }}">{% if english == "yes" %}Blog{% else %}博客{% endif %}</a></li>
+    </ul>
+</div>
+<div class="post-body">
+  {% if resp=="news" %}
+  {% include '_news2.html' %}
+  {% endif %}
+  {% if resp=="blog" %}
+  {% include '_posts.html' %}
+  {% endif %}
+</div>
+{% if pagination %}
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, '.index') }}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{{ pagedown.include_pagedown() }}
+{% endblock %}

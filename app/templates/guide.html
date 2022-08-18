@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
+
+{% block title %}{% if english == "yes" %}Guide{% else %}导航{% endif %}{% endblock title %}
+
+{% block page_content %}
+{% if english == "yes" %}
+
+
+
+<ul class="posts">
+    {% for post in posts %}
+    <li class="post">
+        <div class="post-thumbnail">
+            <a href="{{ url_for('.user', username=post.author.username) }}">
+         {% if post.author.avatar_file != None  %}               
+               <img class="img-rounded profile-thumbnail" src="{{ post.author.avatar_file }}" height=40 width=40>
+         {% else %}
+               <img class="img-rounded profile-thumbnail" src="{{ post.author.gravatar(size=40) }}">
+         {% endif %}                                                           
+            </a>
+        </div>
+        <div class="post-content">
+            <div class="post-date"><small>{{ moment(post.timestamp).fromNow() }}</small></div>
+            <div class="post-author"><a href="{{ url_for('.user', username=post.author.username) }}">{{ post.author.username }}</a></div>
+            <div class="post-body">
+            
+                {% if post.topic %}
+                    <h2><a href="{{ url_for('.post', id=post.id) }}">{{ post.topic }}</a></h2>
+                {% endif %}
+
+                {% if post.pic  %}             
+                <p><img width="256" name="{{'pic'+post.id | string }}" onclick="if({{'pic'+post.id | string }}.width==256){{'pic'+post.id | string }}.width=800;else{ {{'pic'+post.id | string }}.width=256;}" src="{{ post.pic }}" ></p>                            
+                {% endif %}                                                           
+
+              
+                    {{ post.body_html | safe }}
+                
+            </div>
+            <div class="post-footer">
+                {% if current_user == post.author and post.private==True %}
+                    <span style="background-color:#FFFFFF;color:#777777" class="label label-default">Private</span>
+                {% endif %}
+
+                {% if current_user == post.author %}
+                    {% if current_user == post.author and (post.pic1 != None or post.pic2 != None or post.pic3 != None or post.file1 != None or post.file2 != None or post.file3 != None or post.file4 != None or post.file5 != None) %}
+                    <a href="{{ url_for('.edit2', id=post.id) }}">
+                        <span class="label label-primary">Edit</span>
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('.edit', id=post.id) }}">
+                        <span class="label label-primary">Edit</span>
+                    </a>
+                    {% endif %}       
+                {% endif %}       
+
+                {% if current_user.is_administrator() %}
+                <a href="{{ url_for('.edit', id=post.id) }}">
+                    <span class="label label-danger">Edit [Admin]</span>
+                </a>
+                {% endif %}   
+                <a href="{{ url_for('.post', id=post.id) }}">
+                    <span class="label label-default">Link</span>
+                </a>
+         
+                <a href="{{ url_for('.post', id=post.id) }}#comments">
+                    <span class="label label-primary">{{ post.comments.count() }} {% if post.comments.count()>1 %} Comments {% else %} Comment {% endif %}</span>
+                </a>
+            </div>
+        </div>
+    </li>
+    {% endfor %}
+</ul>
+
+
+
+{% else %}
+
+<ul class="posts">
+    {% for post in posts %}
+    <li class="post">
+        <div class="post-thumbnail">
+            <a href="{{ url_for('.user', username=post.author.username) }}">
+         {% if post.author.avatar_file != None  %}               
+               <img class="img-rounded profile-thumbnail" src="{{ post.author.avatar_file }}" height=40 width=40>
+         {% else %}
+               <img class="img-rounded profile-thumbnail" src="{{ post.author.gravatar(size=40) }}">
+         {% endif %}                                                           
+            </a>
+        </div>
+        <div class="post-content">
+            <div class="post-date"><small>{{ moment(post.timestamp).fromNow() }}</small></div>
+            <div class="post-author"><a href="{{ url_for('.user', username=post.author.username) }}">{{ post.author.username }}</a></div>
+            <div class="post-body">
+            
+                {% if post.topic %}
+                    <h2><a href="{{ url_for('.post', id=post.id) }}">{{ post.topic }}</a></h2>
+                {% endif %}
+
+                {% if post.pic %}             
+                <p><img width="256" name="{{'pic'+post.id | string }}" onclick="if({{'pic'+post.id | string }}.width==256){{'pic'+post.id | string }}.width=800;else{ {{'pic'+post.id | string }}.width=256;}" src="{{ post.pic }}" ></p>                            
+                {% endif %}                                                           
+
+              
+                    {{ post.body_html | safe }}
+                
+            </div>
+            <div class="post-footer">
+                {% if current_user == post.author and post.private==True %}
+                    <span style="background-color:#FFFFFF;color:#777777" class="label label-default">私有</span>
+                {% endif %}
+
+                {% if current_user == post.author %}
+                    {% if current_user == post.author and (post.pic1 != None or post.pic2 != None or post.pic3 != None or post.file1 != None or post.file2 != None or post.file3 != None or post.file4 != None or post.file5 != None) %}
+                    <a href="{{ url_for('.edit2', id=post.id) }}">
+                        <span class="label label-primary">编辑</span>
+                    </a>
+		    {% elif post.tag!="posts"%}
+                    <a href="{{ url_for('.edit0', id=post.id) }}">
+                        <span class="label label-primary">编辑</span>
+                    </a>
+		    
+                    {% else %}
+                    <a href="{{ url_for('.edit', id=post.id) }}">
+                        <span class="label label-primary">编辑</span>
+                    </a>
+                    {% endif %}       
+                {% endif %}       
+
+                {% if current_user.is_administrator() %}
+                <a href="{{ url_for('.edit', id=post.id) }}">
+                    <span class="label label-danger">编辑 [Admin]</span>
+                </a>
+                {% endif %}   
+                <a href="{{ url_for('.post', id=post.id) }}">
+                    <span class="label label-default">链接</span>
+                </a>
+         
+                <a href="{{ url_for('.post', id=post.id) }}#comments">
+                    <span class="label label-primary">{{ post.comments.count() }} 评论</span>
+                </a>
+            </div>
+        </div>
+    </li>
+    {% endfor %}
+</ul>
+
+
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{{ pagedown.include_pagedown() }}
+{% endblock %}

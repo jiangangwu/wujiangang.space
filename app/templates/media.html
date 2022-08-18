@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+
+{% block title %}{% if english == "yes" %}Ourspace{% else %}互动空间{% endif %}{% endblock title %}
+
+
+{% block page_content %}
+
+{% if english == "yes" %}
+<div class="post-tabs">
+  <ul class="nav nav-tabs">
+      <li {% if resp == "all"  %} class="active"{% endif %} ><a href="{{ url_for('.show_all') }}">All</a></li>
+      <li {% if resp == "toutiao"  %} class="active" {% endif %}><a href="{{ url_for('.show_toutiao') }}">区块链</a></li>
+      <li {% if resp == "toutiao_english"  %} class="active" {% endif %}><a href="{{ url_for('.show_toutiao_english') }}">Blockchain</a></li>
+      <!-- <li {% if resp == "local"  %} class="active" {% endif %}><a href="{{ url_for('.show_local') }}">Local</a></li> -->
+  </ul>
+
+  {% else %}
+  <div class="post-tabs">
+    <ul class="nav nav-tabs">
+      <li {% if resp == "all"  %} class="active"{% endif %} ><a href="{{ url_for('.show_all') }}">所有</a></li>
+      <Li {% if resp == "toutiao"  %} Class="active" {% endif %}><a href="{{ url_for('.show_toutiao') }}">区块链</a></li>
+      <li {% if resp == "newsflash"  %} class="active" {% endif %}><a href="{{ url_for('.show_newsflash') }}">快讯</a></li>
+      <li {% if resp == "toutiao_english"  %} class="active" {% endif %}><a href="{{ url_for('.show_toutiao_english') }}">Blockchain</a></li>
+      <!-- <li {% if resp == "local"  %} class="active" {% endif %}><a href="{{ url_for('.show_local') }}">本站</a></li> -->
+      
+      <!-- <li {% if resp =="local"  %} class="active" {% endif %}><a href="{{ url_for('.show_local') }}">原创</a></li> -->
+    </ul>
+
+    {% endif %}
+
+    {% include '_news.html' %}
+  </div>
+
+  {% if pagination %}
+  <div class="pagination">
+    {{ macros.pagination_widget(pagination, '.media') }}
+  </div>
+  {% endif %}
+
+
+  {% endblock %}
+
+  {% block scripts %}
+  {{ super() }}
+  {{ pagedown.include_pagedown() }}
+  {% endblock %}

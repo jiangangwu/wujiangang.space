@@ -1,0 +1,388 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+
+{% block title %}{{ user.username }}{% endblock %}
+
+{% block page_content %}
+
+{% if english == "yes" %}
+          <div class="page-header">
+            {% if user == current_user %}
+	    
+              <a href="{{ url_for('main.change_avatar') }}" title="Upload Avatar">
+		{% if user.avatar_file != None %}
+	
+                  <img class="img-rounded profile-thumbnail" src="{{ user.avatar_file }}" width=200>
+		  {% else %}
+		  <p><a href="{{ url_for('main.change_avatar') }}">Upload Avatar</a></p>
+                  <!-- <img class="img-rounded profile-thumbnail" src="{{ user.gravatar(size=200) }}"> -->
+              {% endif %}                                                           
+              </a>
+	      
+          {% else %}
+              {% if user.avatar_file != None %}               
+                  <img class="img-rounded profile-thumbnail" src="{{ user.avatar_file }}" width=200>
+              <!--     <img class="img-rounded profile-thumbnail" src="{{ user.gravatar(size=200) }}"> -->
+              {% endif %}   
+          {% endif %}
+          <div class="profile-header">
+            <h2>{{ user.username }}
+            {% if user.teacher %}  
+                <small><a href="{{url_for('.teacher',id=user.id)}}">Teacher</a></small>
+            {% endif %}</h2>
+            <small>
+              {% if user.name or user.location or user.tel %}
+                  {% if user.name %}{{ user.name }}{% endif %}
+                  {% if user.location %}&nbsp来自&nbsp{{ user.location }}{% endif %}<p/>
+              {% endif %}
+              {% if current_user.can(Permission.FOLLOW) and user != current_user and current_user.is_following(user) %}
+                  <p><a style="text-decoration:none" href="mailto: {{ user.email }}">  {{ user.email }}  </a></p>
+              {% endif %}
+              {% if user == current_user%}
+                  <p><a href="mailto:{{ user.email }}">{{ user.email }}</a></p>
+		  {% endif %}
+	      <!-- 	  {% if current_user.is_administrator() %} -->
+              <!--     <p>{{ user.tel }}</p> -->
+              <!-- {% endif %} -->
+              {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
+              <p>Registered:&nbsp{{ moment(user.member_since).fromNow() }}<br>Last seen:&nbsp{{ moment(user.last_seen).fromNow() }}</p>
+            </small>
+            <p><small><a href="{{ url_for('.user_posts',username=user.username) }}">Blog</a></small><span class="badge">{{ postlength }}</span>
+              &nbsp<a href="{{url_for('main.collection',user_id=user.id)}}"><small>Collect</small><span class="badge">{{ user.n_collected() }} </span></a></p>
+            <p><a href="{{ url_for('main.sent_comments',user_id=user.id) }}"><small>Comment</small><span class="badge">{{ user.comments.count() }} </span></a>
+              &nbsp<a href="{{ url_for('main.comments_on_me',user_id=user.id) }}"><small>Commented</small><span class="badge">{{ user.n_commented() }}
+        
+                  <sup>
+                    {% if user.n_commented_new() != 0 %}
+                    +{{ user.n_commented_new() }}
+                    {% endif %}
+                  </sup>
+            </span></a></p>
+            <p><a href="{{ url_for('.followed_by', username=user.username) }}"><small>Followed</small><span class="badge">{{ user.followed.count() }}</span></a>
+              <a href="{{ url_for('.followers', username=user.username) }}"><small>&nbspFollowers</small><span class="badge">{{ user.followers.count() }}</span></a>
+            </p>
+            {% if user == current_user%}
+            <p><a href="{{ url_for('.show_my_private', username=user.username) }}"><small>Private</small><span class="badge">{{ user.count_private() }}</span></a>
+            <a href="{{ url_for('.show_my_received', username=user.username) }}"><small>@Received</small><span class="badge">{{ user.count_received() }}</span></a></p>
+            {% endif %}
+              &nbsp<a href="{{ url_for('.show_my_atme', username=user.username) }}"><small>@Me</small><span class="badge">{{ user.count_atme() }}</span></a></p>
+            {% if user == current_user %}
+                {% if current_user.teacher %}
+                    <p><a href="{{ url_for('.show_my_selected_classes', username=user.username) }}"><small>Opened Lessons</small><span class="badge">{{ openedlessons | length }}</span></a></p>
+                {% else %}
+                    <p><a href="{{ url_for('.show_my_selected_classes', username=user.username) }}"><small>Selected Lessons</small><span class="badge">{{ mylessons | length }}</span></a></p>
+                {% endif %}
+            {% endif %}        
+
+		    {% if current_user.is_administrator() %}
+            {% if current_user.username == user.username %}
+                <p><a href="{{ url_for('.show_my_all_users', username=user.username) }}"><small>Users</small><span class="badge">{{ users | length }}</span></a></p>
+		{% endif %}
+		{% endif %}
+		
+        {% if current_user.can(Permission.FOLLOW) and user != current_user %}
+            {% if not current_user.is_following(user) %}
+                <a href="{{ url_for('.follow', username=user.username) }}" class="btn btn-primary">Follow</a>
+            {% else %}
+                <a href="{{ url_for('.unfollow', username=user.username) }}" class="btn btn-default">Unfollow</a>
+            {% endif %}
+        {% endif %}      
+        {% if current_user.is_administrator() %}
+        <p><a class="btn btn-danger" href="{{ url_for('main.edit_profile_admin', id=user.id) }}">Modify [Admin]</a></p>
+        {% endif %}
+        
+        </div>
+        </div>
+        <div class="post-tabs">
+          <ul class="nav nav-tabs">
+            <li {% if show_my_private == "0" %} class="active"{% endif %}><a href="{{ url_for('.show_my_all',username=user.username) }}">Blog</a></li>
+            {% if current_user.is_authenticated and current_user.username == user.username %}
+            <li {% if show_my_private == "1" %} class="active"{% endif %}><a href="{{ url_for('.show_my_private',username=user.username) }}">Private</a></li>
+            {% endif %}   
+            <li {% if show_my_private == "2" %} class="active"{% endif %}><a href="{{ url_for('.show_my_selected_classes',username=user.username) }}">Lessons</a></li>
+            <li {% if show_my_private == "3" %} class="active"{% endif %}><a href="{{ url_for('.show_my_atme',username=user.username) }}">@Me</a></li>
+            <li {% if show_my_private == "5" %} class="active"{% endif %}><a href="{{ url_for('.show_my_received',username=user.username) }}">Received</a></li>
+
+            {% if current_user.is_administrator() %}
+            {% if current_user.username == user.username %}
+                <li {% if show_my_private == "4" %} class="active"{% endif %}><a href="{{ url_for('.show_my_all_users',username=user.username) }}">Users</a></li>
+            {% endif %}   
+            {% endif %}   
+        
+          </ul>
+          {% if show_my_private == "0"  %}
+          {% if show_news == 1  %}
+          {% include '_news2.html' %}
+	  {% else %}
+          {% include '_posts.html' %}
+	  
+             {% endif %}
+              {% if pagination %}
+                <div class="pagination">
+                  {{ macros.pagination_widget(pagination, '.user',username=user.username) }}
+                </div>
+             {% endif %}
+          {% endif %}   
+          {% if show_my_private == "1" and current_user.is_authenticated and current_user.username == user.username %}       
+              {% include '_posts_private.html' %}
+              {% if pagination_private %}
+                  <div class="pagination">
+                  {{ macros.pagination_widget(pagination_private, '.user',username=user.username) }}
+                  </div>
+              {% endif %}
+          {% endif %}   
+          {% if show_my_private == "2" %}       
+              {% if mylessons %}
+                  <p>Selected lessons:</p>
+                  {% for mylesson in mylessons %}
+                      <p><a href="{{url_for('main.current_lesson',newlesson_id=mylesson[0].id)}}">{{ mylesson[1].lesson_name }}（{{ mylesson[0].year }}{{ mylesson[0].season }}{{ mylesson[0].about }}）</a></p>
+                  {% endfor %}
+              {% endif %}
+              {% if openedlessons %}
+                  <p>Opened lessons: </p>
+                  {% for openedlesson in openedlessons %}
+                      <p><a href="{{url_for('main.lesson',id=openedlesson.id)}}">{{ openedlesson.lesson_name }}（{{ moment(openedlesson.timestamp).format("YY/MM/DD") }}）</a></p>
+                  {% endfor %}
+              {% endif %}
+          {% endif %}
+          
+          {% if show_my_private == "3" %}  
+              {% if atme_bodies != [] %}
+                  {% for ab in atme_bodies %}
+                      <p>{{moment(ab[1].timestamp).format("YY/MM/DD HH:mm")}}（{{moment(ab[1].timestamp).fromNow()}}），<a href="{{ url_for('.user',username=ab[0].username_whoatme)}}">{{ab[0].username_whoatme}}</a>&nbsp@我&nbsp在：<br>
+                                                  {% if ab[1].post_id == None %}
+                           <cite>&nbsp&nbsp&nbsp&nbsp Original block deleted</cite>
+                        {% else %}
+                           <cite>&nbsp&nbsp&nbsp&nbsp<a href="{{url_for('.post',id=ab[1].post_id)}}">{{ab[1].body}}</a></cite>
+                        {% endif %}
+                        </p>
+
+                  {% endfor %}
+              {% endif %}
+              {% if pagination_atme %}
+                  <div class="pagination">
+                  {{ macros.pagination_widget(pagination_atme, '.user',username=user.username) }}
+                  </div>
+              {% endif %}
+          {% endif %}   
+        
+          {% if show_my_private == "4"  and current_user.is_administrator() and  current_user.username == user.username %}
+        
+                  <table cellspacing='0'  border='1' bordercolor='#D0D0D0' cellpadding='4' align='left'>
+                    <th>ID</th><th>Username</th><th>Real Name</th><th><a href="{{url_for('main.user',username=user.username)}}">Last login date</a></th><th><a href="{{url_for('main.user2',username=user.username)}}">Registered Date</a></th><th>Student's No.</th><th>Email</th><th>Tel No.</th><th>About</th><th>Operation</th>
+                    {% for u in users %}
+                    <tr><td>{{u.id}}</td><td><a href="{{url_for('main.user',username=u.username)}}">{{u.username}}</a></td>
+                      <td>{{u.name}}</td><td>{{moment(u.last_seen).format("YYYY/MM/DD HH:mm")}}</td><td>{{moment(u.member_since).format("YYYY/MM/DD HH:mm") }}</td><td>{{u.student_no}}</td>
+                      <td>{{u.email}}</td><td>{{u.tel}}</td><td>{{u.about_me}}</td>
+                      <td><a onclick="if(confirm('Confirm to del {{u.username}}?')==true)window.location.href='{{ url_for('main.del_user',id=u.id) }}';">Del</a></td></tr>
+                    {% endfor %}
+                </div>
+             {% endif %}
+        
+          {% if show_my_private == "5" and current_user.is_authenticated and current_user.username == user.username %}       
+              {% include '_posts_atme.html' %}
+              {% if pagination_posts_atme %}
+                  <div class="pagination">
+                  {{ macros.pagination_widget(pagination_posts_atme, '.user',username=user.username) }}
+                  </div>
+              {% endif %}
+          {% endif %}   
+        
+        </div>
+
+
+{% else %}
+          <div class="page-header">
+            {% if user == current_user %}
+	    
+              <a href="{{ url_for('main.change_avatar') }}" title="更换头像">
+		{% if user.avatar_file != None %}
+	
+                  <img class="img-rounded profile-thumbnail" src="{{ user.avatar_file }}" width=200>
+		  {% else %}
+		  <p><a href="{{ url_for('main.change_avatar') }}">上传头像</a></p>
+                  <!-- <img class="img-rounded profile-thumbnail" src="{{ user.gravatar(size=200) }}"> -->
+              {% endif %}                                                           
+              </a>
+	      
+          {% else %}
+              {% if user.avatar_file != None %}               
+                  <img class="img-rounded profile-thumbnail" src="{{ user.avatar_file }}" width=200>
+              <!--     <img class="img-rounded profile-thumbnail" src="{{ user.gravatar(size=200) }}"> -->
+              {% endif %}   
+          {% endif %}
+          <div class="profile-header">
+            <h2>{{ user.username }}
+            {% if user.teacher %}  
+                <small><a href="{{url_for('.teacher',id=user.id)}}">老师主页</a></small>
+            {% endif %}</h2>
+            <small>
+              {% if user.name or user.location or user.tel %}
+                  {% if user.name %}{{ user.name }}{% endif %}
+                  {% if user.location %}&nbsp来自&nbsp{{ user.location }}{% endif %}<p/>
+              {% endif %}
+              {% if current_user.can(Permission.FOLLOW) and user != current_user and current_user.is_following(user) %}
+                  <p><a style="text-decoration:none" href="mailto: {{ user.email }}">  {{ user.email }}  </a></p>
+              {% endif %}
+              {% if user == current_user%}
+                  <p><a href="mailto:{{ user.email }}">{{ user.email }}</a></p>
+		  {% endif %}
+	      <!-- 	  {% if current_user.is_administrator() %} -->
+              <!--     <p>{{ user.tel }}</p> -->
+              <!-- {% endif %} -->
+              {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
+              <p>注册日：{{ moment(user.member_since).fromNow() }}<br>上次登录：{{ moment(user.last_seen).fromNow() }}</p>
+            </small>
+            <p><small><a href="{{ url_for('.user_posts',username=user.username) }}">发帖</a></small><span class="badge">{{ postlength }}</span>
+              &nbsp<a href="{{url_for('main.collection',user_id=user.id)}}"><small>收藏</small><span class="badge">{{ user.n_collected() }} </span></a></p>
+            <p><a href="{{ url_for('main.sent_comments',user_id=user.id) }}"><small>评论</small><span class="badge">{{ user.comments.count() }} </span></a>
+              &nbsp<a href="{{ url_for('main.comments_on_me',user_id=user.id) }}"><small>得评论</small><span class="badge">{{ user.n_commented() }}
+        
+                  <sup>
+                    {% if user.n_commented_new() != 0 %}
+                    +{{ user.n_commented_new() }}
+                    {% endif %}
+                  </sup>
+            </span></a></p>
+            <p><a href="{{ url_for('.followed_by', username=user.username) }}"><small>关注</small><span class="badge">{{ user.followed.count() }}</span></a>
+              <a href="{{ url_for('.followers', username=user.username) }}"><small>&nbsp受关注</small><span class="badge">{{ user.followers.count() }}</span></a>
+            </p>
+            {% if user == current_user%}
+            <p><a href="{{ url_for('.show_my_private', username=user.username) }}"><small>私有</small><span class="badge">{{ user.count_private() }}</span></a>
+            <a href="{{ url_for('.show_my_received', username=user.username) }}"><small>收信</small><span class="badge">{{ user.count_received() }}</span></a></p>
+            {% endif %}
+              &nbsp<a href="{{ url_for('.show_my_atme', username=user.username) }}"><small>@我</small><span class="badge">{{ user.count_atme() }}</span></a></p>
+            {% if user == current_user %}
+                {% if current_user.teacher %}
+                    <p><a href="{{ url_for('.show_my_selected_classes', username=user.username) }}"><small>已开课程</small><span class="badge">{{ openedlessons | length }}</span></a></p>
+                {% else %}
+                    <p><a href="{{ url_for('.show_my_selected_classes', username=user.username) }}"><small>已参与课程</small><span class="badge">{{ mylessons | length }}</span></a></p>
+                {% endif %}
+            {% endif %}        
+
+		    {% if current_user.is_administrator() %}
+            {% if current_user.username == user.username %}
+                <p><a href="{{ url_for('.show_my_all_users', username=user.username) }}"><small>用户数</small><span class="badge">{{ users | length }}</span></a></p>
+		{% endif %}
+		{% endif %}
+		
+        {% if current_user.can(Permission.FOLLOW) and user != current_user %}
+            {% if not current_user.is_following(user) %}
+                <a href="{{ url_for('.follow', username=user.username) }}" class="btn btn-primary">关注</a>
+            {% else %}
+                <a href="{{ url_for('.unfollow', username=user.username) }}" class="btn btn-default">取消关注</a>
+            {% endif %}
+        {% endif %}      
+        {% if current_user.is_administrator() %}
+        <p><a class="btn btn-danger" href="{{ url_for('main.edit_profile_admin', id=user.id) }}">修改资料 [管理员]</a></p>
+        {% endif %}
+        
+        </div>
+        </div>
+        <div class="post-tabs">
+          <ul class="nav nav-tabs">
+            <li {% if show_my_private == "0" %} class="active"{% endif %}><a href="{{ url_for('.show_my_all',username=user.username) }}">公开</a></li>
+            {% if current_user.is_authenticated and current_user.username == user.username %}
+            <li {% if show_my_private == "1" %} class="active"{% endif %}><a href="{{ url_for('.show_my_private',username=user.username) }}">私有</a></li>
+            {% endif %}   
+            <li {% if show_my_private == "2" %} class="active"{% endif %}><a href="{{ url_for('.show_my_selected_classes',username=user.username) }}">课程</a></li>
+            <li {% if show_my_private == "3" %} class="active"{% endif %}><a href="{{ url_for('.show_my_atme',username=user.username) }}">@我</a></li>
+            {% if user == current_user%}
+            <li {% if show_my_private == "5" %} class="active"{% endif %}><a href="{{ url_for('.show_my_received',username=user.username) }}">收信</a></li>
+	    {% endif %}
+            {% if current_user.is_administrator() %}
+            {% if current_user.username == user.username %}
+                <li {% if show_my_private == "4" %} class="active"{% endif %}><a href="{{ url_for('.show_my_all_users',username=user.username) }}">用户</a></li>
+            {% endif %}   
+            {% endif %}   
+        
+          </ul>
+          {% if show_my_private == "0"  %}       
+          {% if show_news == 1  %}
+          {% include '_news.html' %}
+	  {% else %}
+          {% include '_posts.html' %}	  
+          {% endif %}
+              {% if pagination %}
+                <div class="pagination">
+                  {{ macros.pagination_widget(pagination, '.user',username=user.username) }}
+                </div>
+             {% endif %}
+          {% endif %}   
+          {% if show_my_private == "1" and current_user.is_authenticated and current_user.username == user.username %}       
+              {% include '_posts_private.html' %}
+              {% if pagination_private %}
+                  <div class="pagination">
+                  {{ macros.pagination_widget(pagination_private, '.user',username=user.username) }}
+                  </div>
+              {% endif %}
+          {% endif %}   
+          {% if show_my_private == "2" %}       
+              {% if mylessons %}
+                  <p>所选课程为：</p>
+                  {% for mylesson in mylessons %}
+                      <p><a href="{{url_for('main.current_lesson',newlesson_id=mylesson[0].id)}}">{{ mylesson[1].lesson_name }}（{{ mylesson[0].year }}{{ mylesson[0].season }}{{ mylesson[0].about }}）</a></p>
+                  {% endfor %}
+              {% endif %}
+              {% if openedlessons %}
+                  <p>所开课程为：</p>
+                  {% for openedlesson in openedlessons %}
+                      <p><a href="{{url_for('main.lesson',id=openedlesson.id)}}">{{ openedlesson.lesson_name }}（{{ moment(openedlesson.timestamp).format("YY/MM/DD") }}）</a></p>
+                  {% endfor %}
+              {% endif %}
+          {% endif %}
+          
+          {% if show_my_private == "3" %}  
+              {% if atme_bodies != [] %}
+                  {% for ab in atme_bodies %}
+                      <p>{{moment(ab[1].timestamp).format("YY/MM/DD HH:mm")}}（{{moment(ab[1].timestamp).fromNow()}}），<a href="{{ url_for('.user',username=ab[0].username_whoatme)}}">{{ab[0].username_whoatme}}</a>&nbsp@我&nbsp在：<br>
+                                                  {% if ab[1].post_id == None %}
+                           <cite>&nbsp&nbsp&nbsp&nbsp 原帖已经删除</cite>
+                        {% else %}
+                           <cite>&nbsp&nbsp&nbsp&nbsp<a href="{{url_for('.post',id=ab[1].post_id)}}">{{ab[1].body}}</a></cite>
+                        {% endif %}
+                        </p>
+
+                  {% endfor %}
+              {% endif %}
+              {% if pagination_atme %}
+                  <div class="pagination">
+                  {{ macros.pagination_widget(pagination_atme, '.user',username=user.username) }}
+                  </div>
+              {% endif %}
+          {% endif %}   
+        
+          {% if show_my_private == "4"  and current_user.is_administrator() and  current_user.username == user.username %}
+        
+                  <table cellspacing='0'  border='1' bordercolor='#D0D0D0' cellpadding='4' align='left'>
+                    <th>ID</th><th>Username</th><th>Real Name</th><th><a href="{{url_for('main.user',username=user.username)}}">Last login date</a></th><th><a href="{{url_for('main.user2',username=user.username)}}">Registered Date</a></th><th>Student's No.</th><th>Email</th><th>Tel No.</th><th>About</th><th>Operation</th>
+                    {% for u in users %}
+                    <tr><td>{{u.id}}</td><td><a href="{{url_for('main.user',username=u.username)}}">{{u.username}}</a></td>
+                      <td>{{u.name}}</td><td>{{moment(u.last_seen).format("YYYY/MM/DD HH:mm")}}</td><td>{{moment(u.member_since).format("YYYY/MM/DD HH:mm") }}</td><td>{{u.student_no}}</td>
+                      <td>{{u.email}}</td><td>{{u.tel}}</td><td>{{u.about_me}}</td>
+                      <td><a onclick="if(confirm('Confirm to del {{u.username}}?')==true)window.location.href='{{ url_for('main.del_user',id=u.id) }}';">Del</a></td></tr>
+                    {% endfor %}
+                </div>
+             {% endif %}
+        
+          {% if show_my_private == "5" and current_user.is_authenticated and current_user.username == user.username %}       
+              {% include '_posts_atme.html' %}
+              {% if pagination_posts_atme %}
+                  <div class="pagination">
+                  {{ macros.pagination_widget(pagination_posts_atme, '.user',username=user.username) }}
+                  </div>
+              {% endif %}
+          {% endif %}   
+        
+        </div>
+
+{% endif %}
+
+
+{% endblock %}
+
+
+{% block scripts %}
+{{ super() }}
+{{ pagedown.include_pagedown() }}
+{% endblock %}

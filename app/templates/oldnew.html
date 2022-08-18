@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
+
+{% block title %}{{post.topic}}{% endblock %}
+
+{% block page_content %}
+
+
+{% if english == "yes" %}
+
+
+
+<div class="post-body">
+  <div class="post-thumbnail">
+    <a href="{{ url_for('.user', username=post.author.username) }}">
+      {% if post.author.avatar_file != None  %}               
+      <img class="img-rounded profile-thumbnail" src="{{ post.author.avatar_file }}" height=40 width=40>
+      
+            <img class="img-rounded profile-thumbnail" src="{{ post.author.gravatar(size=40) }}">
+      {% endif %}                                                           
+    </a>
+  </div>
+  <div class="post-content-en">
+    <div class="post-date"><small>{{ moment(post.timestamp).fromNow() }}</small></div>
+    <div class="post-author"><a href="{{ url_for('.user', username=post.author.username) }}">{{ post.author.username }}</a></div>
+    <div class="post-body">
+      
+      
+      {% if post.topic %}
+      <h2><a href="{{ url_for('.new', id=post.id) }}">{{ post.topic }}</a></h2>
+      {% endif %}
+      {% if names %}
+      {% for n in names %}
+      <a href="{{ url_for('.user',username=n) }}">@{{n}}</a>&nbsp
+      {% endfor %}
+      <p>------------</p>
+      {% endif %}
+      {{ post.body_html | safe }}
+
+
+    </div>
+    <div class="post-footer">
+            {% if current_user.is_administrator() %}
+                    <span class="label label-danger">编辑 [Admin]</span>
+                  </a>
+                  {% endif %}   
+
+      {% if is_collect %}
+      <a href="{{ url_for('.collect2', post_id=post.id, is_collect=is_collect) }}">
+        <span class="label label-default">Uncollect</span>
+      </a>
+      {% else %}
+      <a href="{{ url_for('.collect2', post_id=post.id, is_collect=is_collect) }}">
+        <span class="label label-default">Collect</span>
+      </a>
+      {% endif %}
+
+
+
+
+
+                  <span class="label label-primary">{{ post.readers }} Readers</span>
+		  
+                  <a href="{{ url_for('.new', id=post.id) }}#comments">
+                    <span class="label label-primary">{{ post.comments.count() }} Comments</span>
+                  </a>
+    </div>
+  </div>
+</div>
+<h4 id="comments">Comment</h4>
+<div class="comment-form-flask">
+  {{ wtf.quick_form(form) }}
+</div>
+<div class="pagination">
+  {{ macros.pagination_widget(pagination, '.new', fragment='#comments', id=post.id) }}
+</div>
+
+{% include '_oldnews_comments.html' %}
+{% if pagination %}
+{% endif %}
+<br/><br/><br/><br/><br/><br/>
+
+
+
+
+
+
+{% else %}
+
+
+
+<div class="post-body">
+  <div class="post-thumbnail">
+    <a href="{{ url_for('.user', username=post.author.username) }}">
+      {% if post.author.avatar_file != None  %}               
+      <img class="img-rounded profile-thumbnail" src="{{ post.author.avatar_file }}" height=40 width=40>
+      
+      <!--       <img class="img-rounded profile-thumbnail" src="{{ post.author.gravatar(size=40) }}"> -->
+      {% endif %}                                                           
+    </a>
+  </div>
+  <div class="post-content">
+    <div class="post-date"><small>{{ moment(post.timestamp).fromNow() }}</small></div>
+    <div class="post-author"><a href="{{ url_for('.user', username=post.author.username) }}">{{ post.author.username }}</a></div>
+    <div class="post-body">
+      
+      
+      {% if post.topic %}
+      <h2><a href="{{ url_for('.new', id=post.id) }}">{{ post.topic }}</a></h2>
+      {% endif %}
+      {% if names %}
+      {% for n in names %}
+      <a href="{{ url_for('.user',username=n) }}">@{{ n }}</a>&nbsp
+      {% endfor %}
+      <p>------------</p>
+      {% endif %}
+      {{ post.body_html | safe }}
+      
+    </div>
+    <div class="post-footer">
+      {% if current_user == post.author and post.private==True %}
+      <span style="background-color:#FFFFFF;color:#777777" class="label label-default">私有</span>
+      {% endif %}
+
+      {% if is_collect %}
+      <a href="{{ url_for('.collect2', post_id=post.id, is_collect=is_collect) }}">
+        <span class="label label-default">取消收藏</span>
+      </a>
+      {% else %}
+      <a href="{{ url_for('.collect2', post_id=post.id, is_collect=is_collect) }}">
+        <span class="label label-default">收藏</span>
+      </a>
+      {% endif %}
+
+            {% if current_user.is_administrator() %}
+                    <span class="label label-danger">编辑 [Admin]</span>
+                  </a>
+                  {% endif %}   
+
+                  <a href="{{ url_for('.new', id=post.id) }}#comments">
+                    <span class="label label-primary">{{ post.readers }} 阅读</span>
+                  </a>
+		  
+                  <a href="{{ url_for('.new', id=post.id) }}#comments">
+                    <span class="label label-primary">{{ post.comments.count() }} 评论</span>
+                  </a>
+    </div>
+  </div>
+</div>
+<h4 id="comments">评论</h4>
+<div class="comment-form-flask">
+  {{ wtf.quick_form(form) }}
+</div>
+<div class="pagination">
+  {{ macros.pagination_widget(pagination, '.post', fragment='#comments', id=post.id) }}
+</div>
+{% include '_comments.html' %}
+{% if pagination %}
+{% endif %}
+<br/><br/><br/><br/><br/><br/>
+
+
+
+
+
+{% endif %}
+{% endblock %}
+
+
+{% block scripts %}
+{{ super() }}
+{{ pagedown.include_pagedown() }}
+{% endblock %}

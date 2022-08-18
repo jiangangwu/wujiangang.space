@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
+
+{% block title %}{% if english == "yes" %}Ourspace{% else %}互动空间{% endif %}{% endblock title %}
+
+{% block page_content %}
+<div class="post-tabs">
+  <!-- <ul class="nav nav-tabs"> -->
+  <!--   {% if english == "yes" %} -->
+  <!--   <li class="active" ><a href="{{ url_for('.show_all') }}">All</a></li> -->
+  <!--   {% else %} -->
+  <!--   <li  class="active"><a href="{{ url_for('.show_all') }}">所有</a></li> -->
+  <!--   {% endif %} -->
+  <!-- </ul> -->
+    {% include '_news.html' %}
+</div>
+{% if pagination %}
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, '.index') }}
+</div>
+<div class="footer">
+  <div class="footer-copyright center">Copyright © Wu Jiangang. Contatact by: wujiangang@shu.edu.cn <!-- 备案号：<a href="http://www.beian.miit.gov.cn">沪ICP备16002210号-4</a> --></div>
+  <div class="footer-copyright-m center"><div>Copyright © </div><div>Wu Jiangang. Contatact by: wujiangang@shu.edu.cn <!-- 备案号：<a href="http://www.beian.miit.gov.cn">沪ICP备16002210号-4</a> --></div></div>
+</div>
+
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{{ pagedown.include_pagedown() }}
+{% endblock %}

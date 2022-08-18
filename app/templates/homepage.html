@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
+
+{% block title %}{% if english == "yes" %}CryptoEpoch{% else %}加密纪元{% endif %}{% endblock title %}
+
+
+{% block page_content %}
+
+{% if english == "yes" %}
+<div class="post-tabs">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="{{ url_for('.show_all') }}">All Updates</a></li>
+    </ul>
+</div>
+{% else %}
+<div class="post-tabs">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="{{ url_for('.show_all') }}">所有更新</a></li>
+    </ul>
+</div>
+{% endif %}
+
+
+    {% include '_posts.html' %}
+
+{% if pagination %}
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, '.index') }}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{{ pagedown.include_pagedown() }}
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+
+{% block title %}{% if english == "yes" %}Tools{% else %}工具{% endif %}{% endblock %}
+
+{% block page_content %}
+{% if english == "yes" %}
+<table cellspacing='10px'  border='0' bordercolor='#D0D0D0' cellpadding='10px' align='left'>
+<tr>
+<td>
+         <a  href="{{url_for('main.clock')}}"><img class="img-rounded profile-thumbnail" src="{{ url_for('static',filename='tools/clock.jpg') }}" height=50 width=55></a> 
+                                               <br><br> <br>&nbspClock<br> 
+</td>
+<td>
+         <a  href="{{url_for('main.countdown')}}"><img class="img-rounded profile-thumbnail" src="{{ url_for('static',filename='tools/countdown.jpg') }}" height=50 width=50></a> 
+                                               <br><br> <br>&nbspCountdown<br> 
+</td>
+<td>          <p><a  href="{{url_for('main.white_board')}}"><img class="img-rounded profile-thumbnail" src="{{ url_for('static',filename='tools/whiteboard.png') }}" height=50 width=50></a> 
+                                               <br><br> <br>&nbspWhite Board</a>    
+</td></tr>
+<tr><td>
+          <a href="{{url_for('main.calculator_science')}}"><img class="img-rounded profile-thumbnail" src="{{ url_for('static',filename='tools/calculator.png') }}" height=50 width=50></a> 
+                                              <br><br> <br>Calculator<br> 
+</td><td>          <a href="{{url_for('main.calculator_date')}}"><img class="img-rounded profile-thumbnail" src="{{ url_for('static',filename='tools/calculator_date.png') }}" height=50 width=50></a> 
+                                               <br><br> <br>Date Calculator</a>   
+</td></tr>
+</table>
+{% else %}
+<table cellspacing='10px'  border='0' bordercolor='#D0D0D0' cellpadding='10px' align='left'>
+<tr>
+<td>
+         <a  href="{{url_for('main.clock')}}"><img class="img-rounded profile-thumbnail" src="{{ url_for('static',filename='tools/clock.jpg') }}" height=50 width=55></a> 
+                                               <br><br> <br>&nbsp&nbsp时&nbsp钟<br> 
+</td>
+<td>
+         <a  href="{{url_for('main.countdown')}}"><img class="img-rounded profile-thumbnail" src="{{ url_for('static',filename='tools/countdown.jpg') }}" height=50 width=50></a> 
+                                               <br><br> <br>&nbsp倒计时<br> 
+</td>
+<td>          <p><a  href="{{url_for('main.white_board')}}"><img class="img-rounded profile-thumbnail" src="{{ url_for('static',filename='tools/whiteboard.png') }}" height=50 width=50></a> 
+                                               <br><br> <br>&nbsp白&nbsp板</a>    
+</td>
+</tr>
+<tr>
+<td>
+          <a href="{{url_for('main.calculator_science')}}"><img class="img-rounded profile-thumbnail" src="{{ url_for('static',filename='tools/calculator.png') }}" height=50 width=50></a> 
+                                              <br><br> <br>计算器 <br> 
+</td>
+<td>          <a href="{{url_for('main.calculator_date')}}"><img class="img-rounded profile-thumbnail" src="{{ url_for('static',filename='tools/calculator_date.png') }}" height=50 width=50></a> 
+                                               <br><br> <br>日期计算</a>   
+</td>
+</tr>
+</table>
+{% endif %}
+{% endblock %}

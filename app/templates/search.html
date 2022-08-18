@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}{% if english=="yes" %}Search News{% else %}搜索新闻{% endif %}{% endblock %}
+
+{% block page_content %}
+
+{{ wtf.quick_form(form) }}
+
+<div class="post-tabs">
+  <ul class="nav nav-tabs">
+
+  <!-- {% if english == "yes" %} -->
+  <!--   <li class="active"><a href="{{ url_for('.search') }}">Results</a></li> -->
+
+  <!-- {% else %} -->
+  <!-- <li class="active"><a href="{{ url_for('.search') }}">搜索结果</a></li> -->
+
+<!-- {% endif %} -->
+</ul>
+
+{% include '_posts.html' %}
+</div>
+
+
+{% if pagination %}
+<div class="pagination">
+  {{ macros.pagination_widget(pagination, '.found',keyword=keyword) }}
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{{ pagedown.include_pagedown() }}
+{% endblock %}

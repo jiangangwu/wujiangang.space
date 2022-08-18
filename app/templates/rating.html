@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
+
+{% block title %}{% if english == "yes" %}Rating{% else %}评级{% endif %}{% endblock title %}
+
+{% block page_content %}
+<div class="post-tabs">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="{{ url_for('.research') }}">{% if english == "yes" %}Rating{% else %}评级{% endif %}</a></li>
+    </ul>
+    {% include '_posts.html' %}
+</div>
+{% if pagination %}
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, '.index') }}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{{ pagedown.include_pagedown() }}
+{% endblock %}

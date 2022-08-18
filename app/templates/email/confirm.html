@@ -1,0 +1,7 @@
+<p>尊敬的 {{ user.username }}：</p>
+<p>欢迎加入<b>互动空间</b>！</p>
+<p>要确认您的帐户 <a href="{{ url_for('main.confirm', email=user.email,token=token, _external=True) }}">请点击这里</a></p>
+<p>祝安！</p>
+<p>--</p>
+<p>互动空间</p>
+<p><small>注：此邮件无需回复。</small></p>

@@ -1,0 +1,133 @@
+{% if english == "yes" %}
+
+
+
+<ul class="posts">
+    {% for post in posts %}
+    <li class="post">
+        <div class="post-thumbnail">
+            <a href="{{ url_for('.user', username=post.author.username) }}">
+         {% if post.author.avatar_file != None  %}               
+               <img class="img-rounded profile-thumbnail" src="{{ post.author.avatar_file }}" height=40 width=40>
+         {% else %}
+               <img class="img-rounded profile-thumbnail" src="{{ post.author.gravatar(size=40) }}">
+         {% endif %}                                                           
+            </a>
+        </div>
+        <div class="post-content">
+            <div class="post-date"><small>{{ moment(post.timestamp).fromNow() }}</small></div>
+            <div class="post-author"><a href="{{ url_for('.user', username=post.author.username) }}">{{ post.author.username }}</a></div>
+            <div class="post-body">
+            
+                {% if post.topic %}
+                    <h2><a href="{{ url_for('.oldnew', id=post.id) }}">{{ post.topic }}</a></h2>
+                {% endif %}
+
+
+              
+                {% if post.body_html | length > 500 %}
+                    {{ post.body_html[0:500] | safe }}
+                 <br/><br/>
+                    <a href="{{ url_for('.oldnew', id=post.id) }}">more</a>
+                    {% else %}
+                    {{ post.body_html | safe }}
+                {% endif %}                
+ 
+   
+            </div>
+            <div class="post-footer">
+                {% if current_user == post.author and post.private==True %}
+                    <span style="background-color:#FFFFFF;color:#777777" class="label label-default">Private</span>
+                {% endif %}
+
+                {% if current_user == post.author %}
+                    <a href="{{ url_for('.edit', id=post.id) }}">
+                        <span class="label label-primary">Edit</span>
+                    </a>
+                {% endif %}       
+
+                {% if current_user.is_administrator() %}
+                <a href="{{ url_for('.edit', id=post.id) }}">
+                    <span class="label label-danger">Edit [Admin]</span>
+                </a>
+                {% endif %}   
+                <a href="{{ url_for('.oldnew', id=post.id) }}">
+                    <span class="label label-default">Link</span>
+                </a>
+         
+                <a href="{{ url_for('.oldnew', id=post.id) }}#comments">
+                    <span class="label label-primary">{{ post.comments.count() }} {% if post.comments.count()>1 %} Comments {% else %} Comment {% endif %}</span>
+                </a>
+            </div>
+        </div>
+    </li>
+    {% endfor %}
+</ul>
+
+
+
+{% else %}
+
+<ul class="posts">
+    {% for post in posts %}
+    <li class="post">
+        <div class="post-thumbnail">
+            <a href="{{ url_for('.user', username=post.author.username) }}">
+         {% if post.author.avatar_file != None  %}               
+               <img class="img-rounded profile-thumbnail" src="{{ post.author.avatar_file }}" height=40 width=40>
+         {% else %}
+               <img class="img-rounded profile-thumbnail" src="{{ post.author.gravatar(size=40) }}">
+         {% endif %}                                                           
+            </a>
+        </div>
+        <div class="post-content">
+            <div class="post-date"><small>{{ moment(post.timestamp).fromNow() }}</small></div>
+            <div class="post-author"><a href="{{ url_for('.user', username=post.author.username) }}">{{ post.author.username }}</a></div>
+            <div class="post-body">
+            
+                {% if post.topic %}
+                    <h2><a href="{{ url_for('.oldnew', id=post.id) }}">{{ post.topic }}</a></h2>
+                {% endif %}
+
+
+              
+                {% if post.body_html | length > 500 %}
+                    {{ post.body_html[0:500] | safe }}
+                 <br/><br/>
+                    <a href="{{ url_for('.oldnew', id=post.id) }}">全文</a>
+                    {% else %}
+                    {{ post.body_html | safe }}
+                {% endif %}                
+   
+            </div>
+            <div class="post-footer">
+                {% if current_user == post.author and post.private==True %}
+                    <span style="background-color:#FFFFFF;color:#777777" class="label label-default">私有</span>
+                {% endif %}
+
+                {% if current_user == post.author %}
+                    <a href="{{ url_for('.edit', id=post.id) }}">
+                        <span class="label label-primary">编辑</span>
+                    </a>
+                {% endif %}       
+
+                {% if current_user.is_administrator() %}
+                <a href="{{ url_for('.edit', id=post.id) }}">
+                    <span class="label label-danger">编辑 [Admin]</span>
+                </a>
+                {% endif %}   
+                <a href="{{ url_for('.oldnew', id=post.id) }}">
+                    <span class="label label-default">链接</span>
+                </a>
+         
+                <a href="{{ url_for('.oldnew', id=post.id) }}#comments">
+                    <span class="label label-primary">{{ post.comments.count() }} 评论</span>
+                </a>
+            </div>
+        </div>
+    </li>
+    {% endfor %}
+</ul>
+
+
+{% endif %}
