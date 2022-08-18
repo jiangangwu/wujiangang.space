@@ -1,6 +1,0 @@
-__pycache__/
-config.py
-nohup.out
-jg.py
-myspace_dev.sql
-gunicorn.log
