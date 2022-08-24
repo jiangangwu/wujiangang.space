@@ -6603,3 +6603,11 @@ def output():
 @main.route('/webguide', methods=['GET', 'POST'])
 def webguide():
     return render_template('webguide.html')
+
+@main.route('/baidu_verify_code-RTu0ZniTY6.html')
+def baidu_verify_code():
+    return render_template('baidu_verify_code-RTu0ZniTY6.html')
+
+@main.route('/sogousiteverification.txt')
+def sogousiteverification():
+    return render_template('sogousiteverification.txt')
