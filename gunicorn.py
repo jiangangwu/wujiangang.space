@@ -4,7 +4,7 @@ workers = multiprocessing.cpu_count() * 2 + 1
 
 bind = '0.0.0.0:5000'
 
-timeout = 60
+timeout = 120
 
 
 proc_name = 'app'
